@@ -42,6 +42,7 @@ pile-settlement-model/
 │   └── appendix.tex
 │
 └── scripts/                 ← automation and experiment scripts
+    ├── run_preprocessing.py
     └── run_all_experiments.py
 ```
 
