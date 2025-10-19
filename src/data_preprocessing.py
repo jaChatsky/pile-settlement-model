@@ -133,6 +133,7 @@ def preprocess_and_save(filename: str, target_col: str):
     Load, clean, encode, and scale data. Save processed arrays and DataFrames to PROC_DIR.
     """
     train_df, test_df, val_df = load_data_from_excel(filename)
+    print("Train columns:", train_df.columns.tolist())
     (
         X_train_scaled,
         y_train,
