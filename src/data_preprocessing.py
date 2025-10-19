@@ -22,6 +22,9 @@ def load_data_from_excel(filename: str):
 
     def clean_sheet(name):
         df = pd.read_excel(xls, name)
+        # Print original column names for debugging
+        print(f"Original columns in {name}: {df.columns.tolist()}")
+        
         # Clean column names of spaces and special characters
         df.columns = (
             df.columns
@@ -30,6 +33,9 @@ def load_data_from_excel(filename: str):
             .str.strip()
             .str.replace(r"\s+", " ", regex=True)
         )
+        
+        # Print cleaned column names for debugging
+        print(f"Cleaned columns in {name}: {df.columns.tolist()}")
         return df
 
     return clean_sheet("Training set"), clean_sheet("Testing set"), clean_sheet("Validation set")
