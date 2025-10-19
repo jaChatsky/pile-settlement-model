@@ -1,0 +1,27 @@
+feature,VIF
+EA or EA effec (MN),75.4119618469276
+A bot-Cm2,27.900333743414603
+Perimeter-Cm,146.95570403517877
+L-m,44.44466334297632
+L efec.-m,27.38304012395581
+qc1-Mpa,13.764409396967018
+fs1-Kpa,7.746500454859994
+qc2-Mpa,22.883111862918113
+fs2-Kpa,27.10218268656932
+qc3-Mpa,10.85319637524294
+fs3-kpa,22.71746740359709
+qc4-Mpa,18.67222776765966
+fs4-Kpa,7.002068043575888
+qc5-Mpa,36.45466875545905
+fs5-Kpa,10.478804713278624
+qc-bot-Mpa,22.356960232533982
+P-KN,2.220443787826319
+Type of test_CRP,inf
+Type of test_ML,inf
+Type of pile_Composite,inf
+Type of pile_Concrete,inf
+Type of pile_Steel,inf
+Type of instalation_Bored,inf
+Type of instalation_Driven,inf
+End of Pile_Closed,inf
+End of Pile_Open,inf

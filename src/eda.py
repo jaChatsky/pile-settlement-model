@@ -21,18 +21,35 @@ def load_processed_data(target_col):
     val_features = pd.read_csv(PROC_DIR / "val_cleaned.csv")
     
     # Load target data
-    train_target = pd.read_csv(PROC_DIR / "train_target.csv", names=[target_col])
-    test_target = pd.read_csv(PROC_DIR / "test_target.csv", names=[target_col])
-    val_target = pd.read_csv(PROC_DIR / "val_target.csv", names=[target_col])
+    try:
+        train_target = pd.read_csv(PROC_DIR / "train_target.csv")
+        test_target = pd.read_csv(PROC_DIR / "test_target.csv")
+        val_target = pd.read_csv(PROC_DIR / "val_target.csv")
+
+        # If the target file has only one column, it might not have a proper header
+        # or the column name might be different
+        print("Train target shape:", train_target.shape)
+        print("Train target columns:", train_target.columns.tolist())
+        
+        # If there's only one column, assume it's the target
+        if len(train_target.columns) == 1:
+            # Rename the single column to our target_col
+            train_target.columns = [target_col]
+            test_target.columns = [target_col]
+            val_target.columns = [target_col]
+            print(f"Renamed single column to '{target_col}'")
+
+    except FileNotFoundError as fnf_error:
+        print(f"Target file not found error: {fnf_error}")
+        raise
     
     # Combine features and target into single DataFrames
     train = pd.concat([train_features, train_target], axis=1)
     test = pd.concat([test_features, test_target], axis=1)
     val = pd.concat([val_features, val_target], axis=1)
 
-    print("Loaded train columns:", train.columns.tolist())
-    print("Loaded test columns:", test.columns.tolist())
-    print("Loaded val columns:", val.columns.tolist())
+    print("Final train columns:", train.columns.tolist())
+    print(f"Target column '{target_col}' exists in final train: {target_col in train.columns}")
     
     return train, test, val
 
