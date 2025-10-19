@@ -149,15 +149,7 @@ def preprocess_and_save(filename: str, target_col: str):
     if X_train_scaled.shape[1] != len(feature_names):
         raise ValueError(f"Mismatch between data columns ({X_train_scaled.shape[1]}) and feature names ({len(feature_names)})")
 
-    # Save numpy arrays (these will lose column names, that's expected)
-    np.save(PROC_DIR / "X_train.npy", X_train_scaled)
-    np.save(PROC_DIR / "y_train.npy", y_train.to_numpy())
-    np.save(PROC_DIR / "X_test.npy", X_test_scaled)
-    np.save(PROC_DIR / "y_test.npy", y_test.to_numpy())
-    np.save(PROC_DIR / "X_val.npy", X_val_scaled)
-    np.save(PROC_DIR / "y_val.npy", y_val.to_numpy())
-
-    # FIX: Save CSVs WITH column names - X_train_scaled is already a DataFrame with columns
+    # Save CSVs WITH column names
     X_train_scaled.to_csv(PROC_DIR / "train_cleaned.csv", index=False)
     X_test_scaled.to_csv(PROC_DIR / "test_cleaned.csv", index=False)
     X_val_scaled.to_csv(PROC_DIR / "val_cleaned.csv", index=False)
