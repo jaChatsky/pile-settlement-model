@@ -22,6 +22,3 @@ def main():
     y_val.to_csv(PROC_DIR / "val_target.csv", index = False)
 
     print(f"Processed data with {len(feature_names)} columns saved to: {PROC_DIR}")
-
-if __name__ == "__main__":
-    main()
