@@ -95,5 +95,5 @@ Dataset reference:
 
 ---
 
-**Author:** [Aleksandra Burdakova]
+**Author:** Aleksandra Burdakova
 **License:** MIT
