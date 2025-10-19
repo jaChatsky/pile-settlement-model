@@ -147,9 +147,9 @@ def preprocess_and_save(filename: str, target_col: str):
     print("X_train_scaled shape:", X_train_scaled.shape)
     print("Number of feature names:", len(feature_names))
     if X_train_scaled.shape[1] != len(feature_names):
-        raise ValueError( f"Mismatch between data columns ({X_train_scaled.shape[1]}) and feature names ({len(feature_names)})" )
+        raise ValueError(f"Mismatch between data columns ({X_train_scaled.shape[1]}) and feature names ({len(feature_names)})")
 
-    # Save numpy arrays
+    # Save numpy arrays (these will lose column names, that's expected)
     np.save(PROC_DIR / "X_train.npy", X_train_scaled)
     np.save(PROC_DIR / "y_train.npy", y_train.to_numpy())
     np.save(PROC_DIR / "X_test.npy", X_test_scaled)
@@ -157,17 +157,21 @@ def preprocess_and_save(filename: str, target_col: str):
     np.save(PROC_DIR / "X_val.npy", X_val_scaled)
     np.save(PROC_DIR / "y_val.npy", y_val.to_numpy())
 
-    # Save CSVs with preserved column names
-    pd.DataFrame(X_train_scaled, columns=feature_names).to_csv(PROC_DIR / "train_cleaned.csv", index = False)
-    pd.DataFrame(X_test_scaled, columns=feature_names).to_csv(PROC_DIR / "test_cleaned.csv", index = False)
-    pd.DataFrame(X_val_scaled, columns=feature_names).to_csv(PROC_DIR / "val_cleaned.csv", index = False)
+    # FIX: Save CSVs WITH column names - X_train_scaled is already a DataFrame with columns
+    X_train_scaled.to_csv(PROC_DIR / "train_cleaned.csv", index=False)
+    X_test_scaled.to_csv(PROC_DIR / "test_cleaned.csv", index=False)
+    X_val_scaled.to_csv(PROC_DIR / "val_cleaned.csv", index=False)
+    
+    # Also save target variables
+    y_train.to_csv(PROC_DIR / "train_target.csv", index=False)
+    y_test.to_csv(PROC_DIR / "test_target.csv", index=False)
+    y_val.to_csv(PROC_DIR / "val_target.csv", index=False)
     
     # Save feature names to text file for later reuse
     feature_names_path = PROC_DIR / "feature_names.txt"
     with open(feature_names_path, "w", encoding="utf-8") as f:
         for name in feature_names:
             f.write(name + "\n")
-
 
     print(f"Processed data with {len(feature_names)} columns saved to {PROC_DIR}")
     print(f"Feature names list saved to {feature_names_path}")

@@ -15,9 +15,21 @@ from src.sparse_regression import pca_feature_selection
 
 def load_processed_data():
     """Load cleaned data from PROC_DIR."""
-    train = pd.read_csv(PROC_DIR / "train_cleaned.csv")
-    test = pd.read_csv(PROC_DIR / "test_cleaned.csv")
-    val = pd.read_csv(PROC_DIR / "val_cleaned.csv")
+    # Load feature data
+    train_features = pd.read_csv(PROC_DIR / "train_cleaned.csv")
+    test_features = pd.read_csv(PROC_DIR / "test_cleaned.csv")
+    val_features = pd.read_csv(PROC_DIR / "val_cleaned.csv")
+    
+    # Load target data
+    train_target = pd.read_csv(PROC_DIR / "train_target.csv")
+    test_target = pd.read_csv(PROC_DIR / "test_target.csv")
+    val_target = pd.read_csv(PROC_DIR / "val_target.csv")
+    
+    # Combine features and target into single DataFrames
+    train = pd.concat([train_features, train_target], axis=1)
+    test = pd.concat([test_features, test_target], axis=1)
+    val = pd.concat([val_features, val_target], axis=1)
+    
     return train, test, val
 
 def plot_pairwise(df, target_col):
