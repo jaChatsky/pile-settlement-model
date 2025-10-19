@@ -1,7 +1,9 @@
 pandas
+numpy
 scikit-learn
 matplotlib
 seaborn
 scipy
 statsmodels
+pathlib
 torch
