@@ -8,10 +8,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.decomposition import PCA
+import joblib
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from src.config import PROC_DIR, FIGURES_DIR
-from src.sparse_regression import pca_feature_selection
 
 def load_processed_data(target_col):
     """Load cleaned data from PROC_DIR."""
@@ -63,10 +62,11 @@ def plot_pairwise(df, target_col):
 def plot_correlation_matrix(df):
     """Correlation heatmap of numeric features."""
     corr = df.select_dtypes(include = np.number).corr()
-    plt.figure(figsize = (10, 8))
+    plt.figure(figsize = (8, 6))
     sns.heatmap(corr, cmap="coolwarm", center = 0, annot = False)
     plt.title("Correlation Matrix")
     plt.tight_layout()
+    plt.show()
     plt.savefig(FIGURES_DIR / "correlation_matrix.png", dpi = 300)
     plt.close()
 
@@ -76,6 +76,7 @@ def plot_marginals(df, target_col):
     df[num_cols].hist(bins = 20, figsize = (14, 10))
     plt.suptitle("Marginal Distributions")
     plt.tight_layout()
+    plt.show()
     plt.savefig(FIGURES_DIR / "marginal_distributions.png", dpi = 300)
     plt.close()
 
@@ -84,7 +85,7 @@ def plot_settlement_vs_features(df, target_col, top_n = 5):
     corr = df.corr(numeric_only = True)[target_col].abs().sort_values(ascending = False)
     top_features = corr.index[1 : top_n + 1]
     for feat in top_features:
-        plt.figure()
+        plt.figure(figsize = (8, 6))
         sns.scatterplot(x=df[feat], y=df[target_col])
         plt.title(f"{target_col} vs {feat}")
         plt.tight_layout()
@@ -101,33 +102,41 @@ def compute_vif(df):
     return vif_data
 
 def plot_pca_scree(df):
-    """PCA scree plot showing explained variance ratio."""
-    X = df.select_dtypes(include = np.number).dropna()
-    X_pca, var_ratio = pca_feature_selection(X, n_components = 0.95)
-    plt.figure(figsize = (8, 5))
-    plt.plot(np.cumsum(var_ratio), marker="o")
-    plt.xlabel("Number of Components")
-    plt.ylabel("Cumulative Explained Variance")
-    plt.title("PCA Scree Plot")
+    """Plot a PCA scree plot showing explained variance by component."""
+    from sklearn.decomposition import PCA
+
+    X = df.select_dtypes(include=np.number).dropna()
+    pca = PCA()
+    pca.fit(X)
+
+    explained_var = pca.explained_variance_ratio_
+    cum_var = np.cumsum(explained_var)
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(range(1, len(explained_var) + 1), explained_var, marker='o', label='Individual variance')
+    plt.plot(range(1, len(cum_var) + 1), cum_var, marker='s', linestyle='--', label='Cumulative variance')
+    plt.xlabel('Principal Component')
+    plt.ylabel('Explained Variance Ratio')
+    plt.title('PCA Scree Plot')
+    plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(FIGURES_DIR / "pca_scree_plot.png", dpi = 300)
+    plt.show()
+    plt.savefig(FIGURES_DIR / 'pca_scree_plot.png', dpi=300)
     plt.close()
 
-def run_eda(target_col = "S-mm"):
-    """Main function to run all EDA steps."""
-    train, _, _ = load_processed_data(target_col)
+def load_and_inverse_scale(train_df, test_df, target_col):
+    """Reverse scaling of processed datasets using the saved StandardScaler."""
+    scaler_path = PROC_DIR / "feature_scaler.pkl"
+    if not scaler_path.exists():
+        raise FileNotFoundError(f"Scaler file not found: {scaler_path}")
+    
+    scaler = joblib.load(scaler_path)
+    num_cols = train_df.select_dtypes(include="number").columns.drop(target_col)
 
-    plot_pairwise(train, target_col)
-    plot_correlation_matrix(train)
-    plot_marginals(train, target_col)
-    plot_settlement_vs_features(train, target_col)
-    vif_data = compute_vif(train.drop(columns = [target_col]))
-    plot_pca_scree(train.drop(columns = [target_col]))
+    train_unscaled = train_df.copy()
+    test_unscaled = test_df.copy()
+    train_unscaled[num_cols] = scaler.inverse_transform(train_df[num_cols])
+    test_unscaled[num_cols] = scaler.inverse_transform(test_df[num_cols])
 
-    print("EDA complete. Figures saved to:", FIGURES_DIR)
-    print("High VIF features (potential collinearity):")
-    print(vif_data[vif_data["VIF"] > 10])
-
-if __name__ == "__main__":
-    run_eda()
+    return train_unscaled, test_unscaled

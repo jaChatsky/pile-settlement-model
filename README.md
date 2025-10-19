@@ -1,7 +1,8 @@
 # Pile Settlement Prediction
 
-This project models and predicts **pile settlement** using sparse regression and kernel-based machine learning methods.
-Bayesian techniques are incorporated to quantify uncertainty in predictions, improving engineering decision-making under variable soil and loading conditions.                                                                             |
+This project models and predicts **pile settlement** using sparse regression and kernel-based methods.
+
+Bayesian techniques are incorporated to quantify uncertainty in predictions, improving engineering decision-making under variable soil and loading conditions.                                                                           
 
 ---
 
@@ -20,30 +21,28 @@ pile-settlement-model/
 │
 ├── notebooks/               ← Jupyter notebooks for exploration
 │   ├── 01_data_exploration.ipynb
-│   ├── 02_sparse_models.ipynb
-│   ├── 03_kernel_models.ipynb
-│   └── 04_bayesian_uncertainty.ipynb
+│   └── 02_models_evaluation.ipynb
 │
 ├── src/                     ← Python source code
+│   ├── bayesian_model.py
 │   ├── config.py
 │   ├── data_preprocessing.py
-│   ├── sparse_regression.py
+│   ├── eda.py
+│   ├── evaluation.py
 │   ├── kernel_methods.py
-│   ├── bayesian_model.py
-│   └── evaluation.py
+│   └── sparse_regression.py
 │
 ├── results/                 ← model outputs, figures, and metrics
 │   ├── figures/
-│   └── metrics/
+│   └── models/
 │
-├── report/                  ← academic report (LaTeX)
-│   ├── main.tex
-│   ├── references.bib
-│   └── appendix.tex
+├── report/                  ← academic report
+│   └── Project_SF2935_Group_19.pdf
 │
 └── scripts/                 ← automation and experiment scripts
-    ├── run_preprocessing.py
-    └── run_all_experiments.py
+    ├── run_eda.py
+    ├── run_models.py
+    └── run_preprocessing.py
 ```
 
 ---
@@ -53,8 +52,8 @@ pile-settlement-model/
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/yourname/pile-settlement-prediction.git
-   cd pile-settlement-prediction
+   git clone https://github.com/yourname/pile-settlement-model.git
+   cd pile-settlement-model
    ```
 
 2. Install dependencies:
@@ -72,7 +71,13 @@ pile-settlement-model/
 4. Generate EDA figures:
 
    ```bash
-   python src/eda.py
+   python src/run_eda.py
+   ```
+
+5. Generate models:
+
+   ```bash
+   python src/run_models.py
    ```
 
 ---
@@ -82,9 +87,7 @@ pile-settlement-model/
 | Notebook                        | Description                                                              |
 | ------------------------------- | ------------------------------------------------------------------------ |
 | `01_data_exploration.ipynb`     | Exploratory Data Analysis (EDA): pairplots, correlation matrix, PCA, VIF |
-| `02_sparse_models.ipynb`        | Sparse regression with Ridge, Lasso, PCA-based selection                 |
-| `03_kernel_models.ipynb`        | Nonlinear kernel regression models (RBF, polynomial)                     |
-| `04_bayesian_uncertainty.ipynb` | Bayesian regression and uncertainty quantification                       |
+| `02_models_evaluation.ipynb`    | Sparse, kernel and Bayesian regressions with PCA-based selection         |
 
 ---
 
@@ -92,7 +95,7 @@ pile-settlement-model/
 
 Dataset reference:
 
-> Nejad, F.P., & Jaksa, M.B. (Year). *Dataset on Pile Load Tests*. [Dataset reference PASTE!]
+> Nejad, F.P., & Jaksa, M.B. (Year). *Dataset on Pile Load Tests*. [LINK](https://doi.org/10.1016/J.COMPGEO.2017.04.003)
 
 ---
 

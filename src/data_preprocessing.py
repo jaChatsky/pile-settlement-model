@@ -6,6 +6,7 @@ Encodes categorical columns numerically.
 
 import numpy as np
 import pandas as pd
+import joblib
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from src.config import PROC_DIR, RAW_DIR
 
@@ -125,6 +126,10 @@ def clean_and_scale(train_df, test_df, val_df, target_col: str):
     )
 
     feature_names = X_train_enc.columns.tolist()
+
+    # Save the fitted scaler
+    joblib.dump(scaler, PROC_DIR / "feature_scaler.pkl")
+    print(f"Scaler saved to: {PROC_DIR / 'feature_scaler.pkl'}")
 
     return X_train_scaled, y_train, X_test_scaled, y_test, X_val_scaled, y_val, feature_names
 
