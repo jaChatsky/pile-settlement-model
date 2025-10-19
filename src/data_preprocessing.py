@@ -66,8 +66,8 @@ def clean_and_scale(train_df, test_df, val_df, target_col: str):
         if target_col not in df.columns:
             raise KeyError(f"Target column '{target_col}' not found. Check Excel headers: {df.columns.tolist()}")
 
-        df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
-        df = df.dropna(subset=[target_col])
+        df[target_col] = pd.to_numeric(df[target_col], errors = "coerce")
+        df = df.dropna(subset = [target_col])
 
         # Separate features and target
         X = df.drop(columns = [target_col])
@@ -101,16 +101,27 @@ def clean_and_scale(train_df, test_df, val_df, target_col: str):
     X_test_scaled = scaler.transform(X_test_enc)
     X_val_scaled = scaler.transform(X_val_enc)
 
-    return X_train_scaled, y_train, X_test_scaled, y_test, X_val_scaled, y_val
+    # Preserve full feature names (numeric + encoded)
+    feature_names = X_train_enc.columns.tolist()
+
+    return X_train_scaled, y_train, X_test_scaled, y_test, X_val_scaled, y_val, feature_names
 
 def preprocess_and_save(filename: str, target_col: str):
     """
-    Load, clean, encode, and scale data. Save processed arrays to PROC_DIR.
+    Load, clean, encode, and scale data. Save processed arrays and DataFrames to PROC_DIR.
     """
     train_df, test_df, val_df = load_data_from_excel(filename)
-    X_train_scaled, y_train, X_test_scaled, y_test, X_val_scaled, y_val = clean_and_scale(train_df, test_df, val_df, target_col)
+    (
+        X_train_scaled,
+        y_train,
+        X_test_scaled,
+        y_test,
+        X_val_scaled,
+        y_val,
+        feature_names,
+    ) = clean_and_scale(train_df, test_df, val_df, target_col)
 
-    # Save processed numpy arrays
+    # Save numpy arrays
     np.save(PROC_DIR / "X_train.npy", X_train_scaled)
     np.save(PROC_DIR / "y_train.npy", y_train.to_numpy())
     np.save(PROC_DIR / "X_test.npy", X_test_scaled)
@@ -118,9 +129,9 @@ def preprocess_and_save(filename: str, target_col: str):
     np.save(PROC_DIR / "X_val.npy", X_val_scaled)
     np.save(PROC_DIR / "y_val.npy", y_val.to_numpy())
 
-    # Save cleaned DataFrames too
-    train_df.to_csv(PROC_DIR / "train_cleaned.csv", index = False)
-    test_df.to_csv(PROC_DIR / "test_cleaned.csv", index = False)
-    val_df.to_csv(PROC_DIR / "val_cleaned.csv", index = False)
+    # Save CSVs with full column names
+    pd.DataFrame(X_train_scaled, columns=feature_names).to_csv(PROC_DIR / "train_cleaned.csv", index=False)
+    pd.DataFrame(X_test_scaled, columns=feature_names).to_csv(PROC_DIR / "test_cleaned.csv", index=False)
+    pd.DataFrame(X_val_scaled, columns=feature_names).to_csv(PROC_DIR / "val_cleaned.csv", index=False)
 
-    print(f"Processed data saved to: {PROC_DIR}")
+    print(f"Processed data with {len(feature_names)} columns saved to {PROC_DIR}")
