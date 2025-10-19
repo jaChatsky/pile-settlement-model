@@ -156,10 +156,10 @@ def preprocess_and_save(filename: str, target_col: str):
     X_val_scaled.to_csv(PROC_DIR / "val_cleaned.csv", index=False)
     
     # Also save target variables
-    y_train.to_csv(PROC_DIR / "train_target.csv", index=False)
-    y_test.to_csv(PROC_DIR / "test_target.csv", index=False)
-    y_val.to_csv(PROC_DIR / "val_target.csv", index=False)
-    
+    y_train.to_csv(PROC_DIR / "train_target.csv", index=False, header=['S-mm'])
+    y_test.to_csv(PROC_DIR / "test_target.csv", index=False, header=['S-mm'])
+    y_val.to_csv(PROC_DIR / "val_target.csv", index=False, header=['S-mm'])
+        
     # Save feature names to text file for later reuse
     feature_names_path = PROC_DIR / "feature_names.txt"
     with open(feature_names_path, "w", encoding="utf-8") as f:

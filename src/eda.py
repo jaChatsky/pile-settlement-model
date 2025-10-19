@@ -13,7 +13,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from src.config import PROC_DIR, FIGURES_DIR
 from src.sparse_regression import pca_feature_selection
 
-def load_processed_data():
+def load_processed_data(target_col):
     """Load cleaned data from PROC_DIR."""
     # Load feature data
     train_features = pd.read_csv(PROC_DIR / "train_cleaned.csv")
@@ -21,14 +21,18 @@ def load_processed_data():
     val_features = pd.read_csv(PROC_DIR / "val_cleaned.csv")
     
     # Load target data
-    train_target = pd.read_csv(PROC_DIR / "train_target.csv")
-    test_target = pd.read_csv(PROC_DIR / "test_target.csv")
-    val_target = pd.read_csv(PROC_DIR / "val_target.csv")
+    train_target = pd.read_csv(PROC_DIR / "train_target.csv", names=[target_col])
+    test_target = pd.read_csv(PROC_DIR / "test_target.csv", names=[target_col])
+    val_target = pd.read_csv(PROC_DIR / "val_target.csv", names=[target_col])
     
     # Combine features and target into single DataFrames
     train = pd.concat([train_features, train_target], axis=1)
     test = pd.concat([test_features, test_target], axis=1)
     val = pd.concat([val_features, val_target], axis=1)
+
+    print("Loaded train columns:", train.columns.tolist())
+    print("Loaded test columns:", test.columns.tolist())
+    print("Loaded val columns:", val.columns.tolist())
     
     return train, test, val
 
@@ -95,7 +99,7 @@ def plot_pca_scree(df):
 
 def run_eda(target_col = "S-mm"):
     """Main function to run all EDA steps."""
-    train, _, _ = load_processed_data()
+    train, _, _ = load_processed_data(target_col)
 
     plot_pairwise(train, target_col)
     plot_correlation_matrix(train)
