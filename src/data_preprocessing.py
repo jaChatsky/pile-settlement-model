@@ -23,9 +23,13 @@ def load_data_from_excel(filename: str):
     def clean_sheet(name):
         df = pd.read_excel(xls, name)
         # Clean column names of spaces and special characters
-        df.columns = [
-            c.strip().replace("\xa0", " ").replace("–", "-") for c in df.columns
-        ]
+        df.columns = (
+            df.columns
+            .str.replace("\xa0", " ", regex=False)
+            .str.replace("–", "-", regex=False)
+            .str.strip()
+            .str.replace(r"\s+", " ", regex=True)
+        )
         return df
 
     return clean_sheet("Training set"), clean_sheet("Testing set"), clean_sheet("Validation set")
@@ -48,30 +52,22 @@ def clean_and_scale(train_df, test_df, val_df, target_col: str):
         # Replace comma decimal separators (e.g., 4,25 → 4.25)
         df = df.replace(",", ".", regex = True)
 
-        # Strip spaces and unify column names
-        df.columns = [c.strip() for c in df.columns]
-
         # Drop unneeded text columns
         for col in drop_cols:
             if col in df.columns:
                 df = df.drop(columns = [col])
 
-        # Convert all columns except categorical ones to numeric (if possible)
+        # Convert all columns except categorical ones to numeric
         for col in df.columns:
             if col not in categorical_cols:
-                try:
-                    df[col] = pd.to_numeric(df[col])
-                except (ValueError, TypeError):
-                    pass  # leave non-convertible columns unchanged
+                df[col] = pd.to_numeric(df[col], errors="ignore")
 
-        # If target is stored as string with commas, force numeric conversion
-        if target_col in df.columns:
-            df[target_col] = pd.to_numeric(df[target_col], errors = "coerce")
-        else:
-            raise KeyError(f"Target column '{target_col}' not found. Check Excel headers.")
+        # Verify target exists and is numeric
+        if target_col not in df.columns:
+            raise KeyError(f"Target column '{target_col}' not found. Check Excel headers: {df.columns.tolist()}")
 
-        # Drop rows missing the target variable
-        df = df.dropna(subset = [target_col])
+        df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
+        df = df.dropna(subset=[target_col])
 
         # Separate features and target
         X = df.drop(columns = [target_col])
