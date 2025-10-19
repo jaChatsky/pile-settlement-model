@@ -97,11 +97,27 @@ def clean_and_scale(train_df, test_df, val_df, target_col: str):
 
     # Scale numeric features
     scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train_enc)
-    X_test_scaled = scaler.transform(X_test_enc)
-    X_val_scaled = scaler.transform(X_val_enc)
+    
+    # Fit scaler on training data
+    scaler.fit(X_train_enc)
+    
+    # Transform all datasets while preserving column names
+    X_train_scaled = pd.DataFrame(
+        scaler.transform(X_train_enc),
+        columns = X_train_enc.columns,
+        index = X_train_enc.index
+    )
+    X_test_scaled = pd.DataFrame(
+        scaler.transform(X_test_enc),
+        columns = X_test_enc.columns,
+        index = X_test_enc.index
+    )
+    X_val_scaled = pd.DataFrame(
+        scaler.transform(X_val_enc),
+        columns = X_val_enc.columns,
+        index = X_val_enc.index
+    )
 
-    # Preserve full feature names (numeric + encoded)
     feature_names = X_train_enc.columns.tolist()
 
     return X_train_scaled, y_train, X_test_scaled, y_test, X_val_scaled, y_val, feature_names
